@@ -4,7 +4,7 @@
       "Kiyoshi Aman <kiyoshi.aman@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
    "license" : [
       "perl_5"
    ],
@@ -16,14 +16,16 @@
    "prereqs" : {
       "runtime" : {
          "requires" : {
-            "Path::Abstract" : "0"
+            "File::HomeDir" : 0,
+            "Path::Class" : 0,
+            "perl" : "v5.12.0"
          }
       }
    },
    "provides" : {
       "File::XDG" : {
          "file" : "lib/File/XDG.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -32,5 +34,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02"
 }

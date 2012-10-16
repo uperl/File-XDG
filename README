@@ -24,7 +24,7 @@ SYNOPSIS
 
 DESCRIPTION
     This module provides a basic implementation of the XDG base directory
-    specification as defined by the Free Desktop Organization (FDO). It
+    specification as exists by the Free Desktop Organization (FDO). It
     supports all XDG directories except for the runtime directories, which
     require session management support in order to function.
 
@@ -55,6 +55,10 @@ METHODS
   $xdg->config_dirs()
     Returns the system config directories, not modified for the application.
     Per the specification, the returned string is :-delimited.
+
+ACKNOWLEDGEMENTS
+    This module's Windows support is made possible by "File::HomeDir". I
+    would also like to thank "Path::Class".
 
 AUTHOR
     Kiyoshi Aman <kiyoshi.aman@gmail.com>

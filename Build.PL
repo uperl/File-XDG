@@ -6,7 +6,9 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'File::XDG',
    requires => {
-       'Path::Abstract' => 0,
+       'Path::Class'   => 0,
+       'File::HomeDir' => 0,
+       'perl'          => '5.12.0',
    },
    build_requires => {
    },

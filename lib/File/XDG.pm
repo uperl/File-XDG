@@ -4,11 +4,12 @@ use strict;
 use warnings;
 use feature qw(:5.12);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 use Carp qw(croak);
 
-use Path::Abstract;
+use Path::Class;
+use File::HomeDir;
 
 =head1 NAME
 
@@ -38,7 +39,7 @@ C<File::XDG> - Basic implementation of the XDG base directory specification
 =head1 DESCRIPTION
 
 This module provides a basic implementation of the XDG base directory
-specification as defined by the Free Desktop Organization (FDO). It supports
+specification as exists by the Free Desktop Organization (FDO). It supports
 all XDG directories except for the runtime directories, which require session
 management support in order to function.
 
@@ -76,9 +77,17 @@ sub new {
     return bless $self, $class || ref $class;
 }
 
+sub _win {
+    my ($type) = @_;
+
+    return File::HomeDir->my_data;
+}
+
 sub _home {
     my ($type) = @_;
     my $home = $ENV{HOME};
+
+    return _win($type) unless ($^O !~ /win/i);
 
     given ($type) {
         when ('data') {
@@ -108,13 +117,13 @@ sub data_home {
 
     my $xdg;
 
-    if (defined($ENV{XDG_DATA_HOME})) {
+    if (exists($ENV{XDG_DATA_HOME})) {
         $xdg = $ENV{XDG_DATA_HOME};
     } else {
         $xdg = _home('data');
     }
 
-    return Path::Abstract->new($xdg)->push($self->{name})->stringify;
+    return dir($xdg, $self->{name});
 }
 
 =head2 $xdg->config_home()
@@ -128,13 +137,13 @@ sub config_home {
 
     my $xdg;
 
-    if (defined($ENV{XDG_CONFIG_HOME})) {
+    if (exists($ENV{XDG_CONFIG_HOME})) {
         $xdg = $ENV{XDG_CONFIG_HOME};
     } else {
         $xdg = _home('config');
     }
 
-    return Path::Abstract->new($xdg)->push($self->{name})->stringify;
+    return dir($xdg, $self->{name});
 }
 
 =head2 $xdg->cache_home()
@@ -148,13 +157,13 @@ sub cache_home {
 
     my $xdg;
 
-    if (defined($ENV{XDG_CACHE_HOME})) {
+    if (exists($ENV{XDG_CACHE_HOME})) {
         $xdg = $ENV{XDG_CACHE_HOME};
     } else {
         $xdg = _home('cache');
     }
 
-    return Path::Abstract->new($xdg)->push($self->{name})->stringify;
+    return dir($xdg, $self->{name});
 }
 
 =head2 $xdg->data_dirs()
@@ -167,7 +176,7 @@ specification, the returned string is :-delimited.
 sub data_dirs {
     my $self = shift;
 
-    if (defined($ENV{XDG_DATA_DIRS})) {
+    if (exists($ENV{XDG_DATA_DIRS})) {
         return $ENV{XDG_DATA_DIRS};
     } else {
         return '/usr/local/share:/usr/share'
@@ -184,12 +193,16 @@ the specification, the returned string is :-delimited.
 sub config_dirs {
     my $self = shift;
 
-    if (defined($ENV{XDG_CONFIG_DIRS})) {
+    if (exists($ENV{XDG_CONFIG_DIRS})) {
         return $ENV{XDG_CONFIG_DIRS};
     } else {
         return '/etc/xdg'
     }
 }
+
+=head1 ACKNOWLEDGEMENTS
+
+This module's Windows support is made possible by C<File::HomeDir>. I would also like to thank C<Path::Class>. 
 
 =head1 AUTHOR
 
