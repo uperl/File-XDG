@@ -18,14 +18,14 @@
          "requires" : {
             "File::HomeDir" : 0,
             "Path::Class" : 0,
-            "perl" : "v5.12.0"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "File::XDG" : {
          "file" : "lib/File/XDG.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -34,5 +34,5 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02"
+   "version" : "0.03"
 }

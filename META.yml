@@ -13,11 +13,11 @@ name: File-XDG
 provides:
   File::XDG:
     file: lib/File/XDG.pm
-    version: 0.02
+    version: 0.03
 requires:
   File::HomeDir: 0
   Path::Class: 0
-  perl: v5.12.0
+  perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.02
+version: 0.03

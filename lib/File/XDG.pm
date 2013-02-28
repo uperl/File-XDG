@@ -2,9 +2,9 @@ package File::XDG;
 
 use strict;
 use warnings;
-use feature qw(:5.12);
+use feature qw(:5.10);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 use Carp qw(croak);
 
@@ -117,7 +117,7 @@ sub data_home {
 
     my $xdg;
 
-    if (exists($ENV{XDG_DATA_HOME})) {
+    if (defined($ENV{XDG_DATA_HOME})) {
         $xdg = $ENV{XDG_DATA_HOME};
     } else {
         $xdg = _home('data');
@@ -137,7 +137,7 @@ sub config_home {
 
     my $xdg;
 
-    if (exists($ENV{XDG_CONFIG_HOME})) {
+    if (defined($ENV{XDG_CONFIG_HOME})) {
         $xdg = $ENV{XDG_CONFIG_HOME};
     } else {
         $xdg = _home('config');
@@ -157,7 +157,7 @@ sub cache_home {
 
     my $xdg;
 
-    if (exists($ENV{XDG_CACHE_HOME})) {
+    if (defined($ENV{XDG_CACHE_HOME})) {
         $xdg = $ENV{XDG_CACHE_HOME};
     } else {
         $xdg = _home('cache');
@@ -176,7 +176,7 @@ specification, the returned string is :-delimited.
 sub data_dirs {
     my $self = shift;
 
-    if (exists($ENV{XDG_DATA_DIRS})) {
+    if (defined($ENV{XDG_DATA_DIRS})) {
         return $ENV{XDG_DATA_DIRS};
     } else {
         return '/usr/local/share:/usr/share'
@@ -193,7 +193,7 @@ the specification, the returned string is :-delimited.
 sub config_dirs {
     my $self = shift;
 
-    if (exists($ENV{XDG_CONFIG_DIRS})) {
+    if (defined($ENV{XDG_CONFIG_DIRS})) {
         return $ENV{XDG_CONFIG_DIRS};
     } else {
         return '/etc/xdg'
