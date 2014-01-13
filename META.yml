@@ -4,7 +4,7 @@ author:
   - 'Kiyoshi Aman <kiyoshi.aman@gmail.com>'
 build_requires: {}
 dynamic_config: 1
-generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -13,11 +13,11 @@ name: File-XDG
 provides:
   File::XDG:
     file: lib/File/XDG.pm
-    version: 0.03
+    version: 0.04
 requires:
   File::HomeDir: 0
   Path::Class: 0
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.03
+version: 0.04

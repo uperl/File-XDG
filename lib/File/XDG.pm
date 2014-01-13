@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use feature qw(:5.10);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 use Carp qw(croak);
 
-use Path::Class;
+use Path::Class qw(dir file);
 use File::HomeDir;
 
 =head1 NAME
@@ -18,8 +18,8 @@ C<File::XDG> - Basic implementation of the XDG base directory specification
 =head1 SYNOPSIS
 
  use File::XDG;
- 
- my $xdg = File::XDG->new('foo');
+
+ my $xdg = File::XDG->new(name => 'foo');
 
  # user config
  $xdg->config_home
@@ -87,19 +87,47 @@ sub _home {
     my ($type) = @_;
     my $home = $ENV{HOME};
 
-    return _win($type) unless ($^O !~ /win/i);
+    return _win($type) if ($^O eq 'MSWin32');
 
     given ($type) {
         when ('data') {
-            return "$home/.local/share/"
+            return ($ENV{XDG_DATA_HOME} || "$home/.local/share/")
         } when ('config') {
-            return "$home/.config/"
+            return ($ENV{XDG_CONFIG_HOME} || "$home/.config/")
         } when ('cache') {
-            return "$home/.cache/"
+            return ($ENV{XDG_CACHE_HOME} || "$home/.cache/")
         } default {
-            croak 'invalid user home requested'
+            croak 'invalid _home requested'
         }
     }
+}
+
+sub _dirs {
+    my $type = shift;
+
+    given ($type) {
+        when ('data') {
+            return ($ENV{XDG_DATA_DIRS} || '/usr/local/share:/usr/share')
+        } when ('config') {
+            return ($ENV{XDG_CONFIG_DIRS} || '/etc/xdg')
+        } default {
+            croak 'invalid _dirs requested'
+        }
+    }
+}
+
+sub _lookup_file {
+    my ($self, $type, @subpath) = @_;
+
+    unless (@subpath) {
+        croak 'subpath not specified';
+    }
+
+    my @dirs = (_home($type), split(':', _dirs($type)));
+    my @paths = map { file($_, @subpath) } @dirs;
+    my ($match) = grep { -f $_ } @paths;
+
+    return $match;
 }
 
 =head1 METHODS
@@ -108,61 +136,37 @@ sub _home {
 
 =head2 $xdg->data_home()
 
-Returns the user-specific data directory for the application.
+Returns the user-specific data directory for the application as a C<Path::Class> object.
 
 =cut
 
 sub data_home {
     my $self = shift;
-
-    my $xdg;
-
-    if (defined($ENV{XDG_DATA_HOME})) {
-        $xdg = $ENV{XDG_DATA_HOME};
-    } else {
-        $xdg = _home('data');
-    }
-
+    my $xdg = _home('data');
     return dir($xdg, $self->{name});
 }
 
 =head2 $xdg->config_home()
 
-Returns the user-specific configuration directory for the application.
+Returns the user-specific configuration directory for the application as a C<Path::Class> object.
 
 =cut
 
 sub config_home {
     my $self = shift;
-
-    my $xdg;
-
-    if (defined($ENV{XDG_CONFIG_HOME})) {
-        $xdg = $ENV{XDG_CONFIG_HOME};
-    } else {
-        $xdg = _home('config');
-    }
-
+    my $xdg = _home('config');
     return dir($xdg, $self->{name});
 }
 
 =head2 $xdg->cache_home()
 
-Returns the user-specific cache directory for the application.
+Returns the user-specific cache directory for the application as a C<Path::Class> object.
 
 =cut
 
 sub cache_home {
     my $self = shift;
-
-    my $xdg;
-
-    if (defined($ENV{XDG_CACHE_HOME})) {
-        $xdg = $ENV{XDG_CACHE_HOME};
-    } else {
-        $xdg = _home('cache');
-    }
-
+    my $xdg = _home('cache');
     return dir($xdg, $self->{name});
 }
 
@@ -174,13 +178,7 @@ specification, the returned string is :-delimited.
 =cut
 
 sub data_dirs {
-    my $self = shift;
-
-    if (defined($ENV{XDG_DATA_DIRS})) {
-        return $ENV{XDG_DATA_DIRS};
-    } else {
-        return '/usr/local/share:/usr/share'
-    }
+    return _dirs('data');
 }
 
 =head2 $xdg->config_dirs()
@@ -191,18 +189,44 @@ the specification, the returned string is :-delimited.
 =cut
 
 sub config_dirs {
-    my $self = shift;
-
-    if (defined($ENV{XDG_CONFIG_DIRS})) {
-        return $ENV{XDG_CONFIG_DIRS};
-    } else {
-        return '/etc/xdg'
-    }
+    return _dirs('config');
 }
+
+=head2 $xdg->lookup_data_file('subdir', 'filename');
+
+Looks up the data file by searching for ./subdir/filename relative to all base
+directories indicated by $XDG_DATA_HOME and $XDG_DATA_DIRS. If an environment
+variable is either not set or empty, its default value as defined by the
+specification is used instead. Returns a C<Path::Class> object.
+
+=cut
+
+sub lookup_data_file {
+    my ($self, @subpath) = @_;
+    return $self->_lookup_file('data', @subpath);
+}
+
+=head2 $xdg->lookup_config_file('subdir', 'filename');
+
+Looks up the configuration file by searching for ./subdir/filename relative to
+all base directories indicated by $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS. If an
+environment variable is either not set or empty, its default value as defined
+by the specification is used instead. Returns a C<Path::Class> object.
+
+=cut
+
+sub lookup_config_file {
+    my ($self, @subpath) = @_;
+    return $self->_lookup_file('config', @subpath);
+}
+
+=head1 SEE ALSO
+
+L<XDG Base Directory specification, version 0.7|http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html>
 
 =head1 ACKNOWLEDGEMENTS
 
-This module's Windows support is made possible by C<File::HomeDir>. I would also like to thank C<Path::Class>. 
+This module's Windows support is made possible by C<File::HomeDir>. I would also like to thank C<Path::Class> and C<File::Spec>.
 
 =head1 AUTHOR
 
