@@ -9,5 +9,5 @@ t/99pod.t
 Makefile.PL
 README
 LICENSE
-META.yml
 META.json
+META.yml
