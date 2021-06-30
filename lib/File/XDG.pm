@@ -2,7 +2,6 @@ package File::XDG;
 
 use strict;
 use warnings;
-use feature qw(:5.10);
 
 our $VERSION = '0.04_001';
 
@@ -70,8 +69,11 @@ sub new {
     my $class = shift;
     my %args = (@_);
 
+    my $name = delete $args{name};
+    croak('application name required') unless defined $name;
+
     my $self = {
-        name => delete $args{name} // croak('application name required'),
+        name => $name,
     };
 
     return bless $self, $class || ref $class;
