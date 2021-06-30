@@ -6,7 +6,6 @@ t/01env.t
 t/02noenv.t
 t/03lookup.t
 t/99pod.t
-Makefile.PL
 README
 LICENSE
 META.json
