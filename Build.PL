@@ -9,9 +9,6 @@ my $build = Module::Build->new(
        'Path::Class'   => 0,
        'File::HomeDir' => 0,
        'File::Path'    => '2.07',
-       'perl'          => '5.10.0',
-   },
-   build_requires => {
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
