@@ -4,7 +4,7 @@ author:
   - 'Kiyoshi Aman <kiyoshi.aman@gmail.com>'
 build_requires: {}
 dynamic_config: 1
-generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,8 +16,10 @@ provides:
     version: 0.04_001
 requires:
   File::HomeDir: '0'
+  File::Path: '2.07'
   Path::Class: '0'
   perl: v5.10.0
 resources:
   license: http://dev.perl.org/licenses/
 version: 0.04_001
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
