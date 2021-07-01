@@ -2,6 +2,7 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
   - Added Changes file for future changes
+  - New maintainer
 
 0.04_001       2014-10-08
   - Removed retroactively experimental Perl features
