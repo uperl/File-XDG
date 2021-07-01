@@ -10,19 +10,19 @@ use File::XDG;
 my $xdg = File::XDG->new(name => 'foo');
 
 # user config
-$xdg->config_home
+my $path = $xdg->config_home;
 
 # user data
-$xdg->data_home
+my $path = $xdg->data_home;
 
 # user cache
-$xdg->cache_home
+my $path = $xdg->cache_home;
 
 # system config
-$xdg->config_dirs
+my @dirs = split /:/, $xdg->config_dirs;
 
 # system data
-$xdg->data_dirs
+my @dirs = split /:/, $xdg->data_dirs;
 ```
 
 # DESCRIPTION
