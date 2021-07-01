@@ -100,7 +100,7 @@ my $path = $xdg->lookup_data_file($subdir, $filename);
 ```
 
 Looks up the data file by searching for `./$subdir/$filename` relative to all base
-directories indicated by $XDG\_DATA\_HOME and $XDG\_DATA\_DIRS. If an environment
+directories indicated by `$XDG_DATA_HOME` and `$XDG_DATA_DIRS`. If an environment
 variable is either not set or empty, its default value as defined by the
 specification is used instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
 
@@ -111,7 +111,7 @@ my $path = $xdg->lookup_config_file($subdir, $filename);
 ```
 
 Looks up the configuration file by searching for `./$subdir/$filename` relative to
-all base directories indicated by $XDG\_CONFIG\_HOME and $XDG\_CONFIG\_DIRS. If an
+all base directories indicated by `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an
 environment variable is either not set or empty, its default value as defined
 by the specification is used instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
 

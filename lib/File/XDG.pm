@@ -199,7 +199,7 @@ sub config_dirs {
  my $path = $xdg->lookup_data_file($subdir, $filename);
 
 Looks up the data file by searching for C<./$subdir/$filename> relative to all base
-directories indicated by $XDG_DATA_HOME and $XDG_DATA_DIRS. If an environment
+directories indicated by C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment
 variable is either not set or empty, its default value as defined by the
 specification is used instead. Returns a L<Path::Class> object.
 
@@ -215,7 +215,7 @@ sub lookup_data_file {
  my $path = $xdg->lookup_config_file($subdir, $filename);
 
 Looks up the configuration file by searching for C<./$subdir/$filename> relative to
-all base directories indicated by $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS. If an
+all base directories indicated by C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an
 environment variable is either not set or empty, its default value as defined
 by the specification is used instead. Returns a L<Path::Class> object.
 
