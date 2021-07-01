@@ -1,6 +1,4 @@
-/Build
 /File-XDG-*
-/MYMETA.*
-/_build
+/.build
 *.bak
 *.swp
