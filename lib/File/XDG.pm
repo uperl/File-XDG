@@ -43,16 +43,18 @@ management support in order to function.
 
 =cut
 
-=head2 $xdg = File::XDG->new( %args )
+=head2 new
 
-Returns a new instance of a C<File::XDG> object. This must be called with an
-application name as the C<name> argument.
+ my $xdg = File::XDG->new( %args );
+
+Returns a new instance of a L<File::XDG> object. This must be called with an
+application name as the L</name> argument.
 
 Takes the following named arguments:
 
-=over 8
+=over 4
 
-=item name => STRING
+=item name
 
 Name of the application for which File::XDG is being used.
 
@@ -124,11 +126,11 @@ sub _lookup_file {
 
 =head1 METHODS
 
-=cut
+=head2 data_home
 
-=head2 $xdg->data_home()
+ my $path = $xdg->data_home;
 
-Returns the user-specific data directory for the application as a C<Path::Class> object.
+Returns the user-specific data directory for the application as a L<Path::Class> object.
 
 =cut
 
@@ -138,9 +140,11 @@ sub data_home {
     return dir($xdg, $self->{name});
 }
 
-=head2 $xdg->config_home()
+=head2 config_home
 
-Returns the user-specific configuration directory for the application as a C<Path::Class> object.
+ my $path = $xdg->config_home;
+
+Returns the user-specific configuration directory for the application as a L<Path::Class> object.
 
 =cut
 
@@ -150,9 +154,11 @@ sub config_home {
     return dir($xdg, $self->{name});
 }
 
-=head2 $xdg->cache_home()
+=head2 cache_home
 
-Returns the user-specific cache directory for the application as a C<Path::Class> object.
+ my $path = $xdg->cache_home;
+
+Returns the user-specific cache directory for the application as a L<Path::Class> object.
 
 =cut
 
@@ -162,7 +168,9 @@ sub cache_home {
     return dir($xdg, $self->{name});
 }
 
-=head2 $xdg->data_dirs()
+=head2 data_dirs
+
+ my $dirs = $xdg->data_dirs;
 
 Returns the system data directories, not modified for the application. Per the
 specification, the returned string is :-delimited.
@@ -173,7 +181,9 @@ sub data_dirs {
     return _dirs('data');
 }
 
-=head2 $xdg->config_dirs()
+=head2 config_dirs
+
+ my $dirs = $xdg->config_dirs;
 
 Returns the system config directories, not modified for the application. Per
 the specification, the returned string is :-delimited.
@@ -184,12 +194,14 @@ sub config_dirs {
     return _dirs('config');
 }
 
-=head2 $xdg->lookup_data_file('subdir', 'filename');
+=head2 lookup_data_file
 
-Looks up the data file by searching for ./subdir/filename relative to all base
+ my $path = $xdg->lookup_data_file($subdir, $filename);
+
+Looks up the data file by searching for C<./$subdir/$filename> relative to all base
 directories indicated by $XDG_DATA_HOME and $XDG_DATA_DIRS. If an environment
 variable is either not set or empty, its default value as defined by the
-specification is used instead. Returns a C<Path::Class> object.
+specification is used instead. Returns a L<Path::Class> object.
 
 =cut
 
@@ -198,12 +210,14 @@ sub lookup_data_file {
     return $self->_lookup_file('data', @subpath);
 }
 
-=head2 $xdg->lookup_config_file('subdir', 'filename');
+=head2 lookup_config_file
 
-Looks up the configuration file by searching for ./subdir/filename relative to
+ my $path = $xdg->lookup_config_file($subdir, $filename);
+
+Looks up the configuration file by searching for C<./$subdir/$filename> relative to
 all base directories indicated by $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS. If an
 environment variable is either not set or empty, its default value as defined
-by the specification is used instead. Returns a C<Path::Class> object.
+by the specification is used instead. Returns a L<Path::Class> object.
 
 =cut
 
@@ -218,7 +232,7 @@ L<XDG Base Directory specification, version 0.7|http://standards.freedesktop.org
 
 =head1 ACKNOWLEDGEMENTS
 
-This module's Windows support is made possible by C<File::HomeDir>. I would also like to thank C<Path::Class> and C<File::Spec>.
+This module's Windows support is made possible by L<File::HomeDir>. I would also like to thank L<Path::Class> and L<File::Spec>.
 
 =cut
 
