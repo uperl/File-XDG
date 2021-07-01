@@ -10,7 +10,6 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
-  Carp
   ExtUtils::MakeMaker
   File::HomeDir
   File::Path
