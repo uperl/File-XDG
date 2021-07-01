@@ -3,44 +3,52 @@ use warnings;
 use Test::More;
 use File::XDG;
 use File::Temp;
+use Path::Class qw( dir );
 use File::Path qw(make_path);
+use if $^O eq 'MSWin32', 'Win32';
+
+our $base = $^O ne 'MSWin32'
+  ? $ENV{HOME} || [getpwuid($>)]->[7]
+  : Win32::GetFolderPath(Win32::CSIDL_LOCAL_APPDATA(), 1);
 
 subtest 'env' => sub {
+  local %ENV = %ENV;
+  $ENV{XDG_CONFIG_HOME} = '/home/user/.config';
+  $ENV{XDG_DATA_HOME} = '/home/user/.local/share';
+  $ENV{XDG_CACHE_HOME} = '/home/user/.cache';
+  $ENV{XDG_DATA_DIRS} = '/usr/local/share:/usr/share';
+  $ENV{XDG_CONFIG_DIRS} = '/etc/xdg';
+  local $base = "/home/user";
+
   my $xdg = File::XDG->new(name => 'test');
 
-  {
-    local $ENV{XDG_CONFIG_HOME} = '/home/user/.config';
-    ok($xdg->config_home eq '/home/user/.config/test', 'user-specific app configuration');
-  }
-  {
-    local $ENV{XDG_DATA_HOME} = '/home/user/.local/share';
-    ok($xdg->data_home eq '/home/user/.local/share/test', 'user-specific app data');
-  }
-  {
-    local $ENV{XDG_CACHE_HOME} = '/home/user/.cache';
-    ok($xdg->cache_home eq '/home/user/.cache/test', 'user-specific app cache');
-  }
-  {
-    local $ENV{XDG_DATA_DIRS} = '/usr/local/share:/usr/share';
-    ok($xdg->data_dirs eq '/usr/local/share:/usr/share', 'system-wide data directories');
-  }
-  {
-    local $ENV{XDG_CONFIG_DIRS} = '/etc/xdg';
-    ok($xdg->config_dirs eq '/etc/xdg', 'system-wide configuration directories');
-  }
+  is($xdg->config_home, dir($base, '.config/test'), 'user-specific app configuration');
+  is($xdg->data_home, dir($base, '.local/share/test'), 'user-specific app data');
+  is($xdg->cache_home, dir($base, '.cache/test'), 'user-specific app cache');
+  is($xdg->data_dirs, '/usr/local/share:/usr/share', 'system-wide data directories');
+  is($xdg->config_dirs, '/etc/xdg', 'system-wide configuration directories');
 };
 
 subtest 'noenv' => sub {
+  local %ENV = %ENV;
+  delete $ENV{$_} for qw( XDG_DATA_HOME XDG_CONFIG_HOME XDG_CACHE_HOME XDG_DATA_DIRS XDG_CONFIG_DIRS );
+
   my $xdg = File::XDG->new(name => 'test');
 
   {
-    local $ENV{HOME} = '/home/test';
-    local $ENV{XDG_CONFIG_HOME};
-    is($xdg->config_home, '/home/test/.config/test', 'user-specific app configuration');
-    local $ENV{XDG_DATA_HOME};
-    is($xdg->data_home, '/home/test/.local/share/test', 'user-specific app data');
-    local $ENV{XDG_CACHE_HOME};
-    is($xdg->cache_home, '/home/test/.cache/test', 'user-specific app cache');
+    is($xdg->config_home, dir($base, '.config/test'), 'user-specific app configuration');
+    is($xdg->data_home, dir($base, '.local/share/test'), 'user-specific app data');
+    is($xdg->cache_home, dir($base, '.cache/test'), 'user-specific app cache');
+    if($^O eq 'MSWin32')
+    {
+      is($xdg->data_dirs, '', 'system-wide data directories');
+      is($xdg->config_dirs, '', 'system-wide configuration directories');
+    }
+    else
+    {
+      is($xdg->data_dirs, '/usr/local/share:/usr/share', 'system-wide data directories');
+      is($xdg->config_dirs, '/etc/xdg', 'system-wide configuration directories');
+    }
   }
 };
 

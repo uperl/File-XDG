@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Carp qw(croak);
 use Path::Class qw(dir file);
-use File::HomeDir;
+use Config;
+use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
-# VERSION:
+# VERSION
 
 =head1 SYNOPSIS
 
@@ -69,55 +70,44 @@ sub new {
     my $name = delete $args{name};
     croak('application name required') unless defined $name;
 
-    my $self = {
+    corak("unknown arguments: @{[ sort keys %args ]}") if %args;
+
+    my $self = bless {
         name => $name,
-    };
+    }, $class;
 
-    return bless $self, $class || ref $class;
-}
+    if($^O eq 'MSWin32') {
+        my $local = Win32::GetFolderPath(Win32::CSIDL_LOCAL_APPDATA(), 1);
+        $self->{data}        = $ENV{XDG_DATA_HOME}   || "$local\\.local\\share\\";
+        $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$local\\.cache\\";
+        $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$local\\.config\\";
+        $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '';
+        $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '';
+    } else {
+        my $home = $ENV{HOME} || [getpwuid($>)]->[7];
+        $self->{data}        = $ENV{XDG_DATA_HOME}   || "$home/.local/share/";
+        $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$home/.cache/";
+        $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$home/.config/";
+        $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '/usr/local/share:/usr/share';
+        $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '/etc/xdg';
+    }
 
-sub _win {
-    my ($type) = @_;
-
-    return File::HomeDir->my_data;
-}
-
-sub _home {
-    my ($type) = @_;
-    my $home = $ENV{HOME};
-
-    $home = _win($type) if ($^O eq 'MSWin32');
-
-    my %locations = (
-        data => ($ENV{XDG_DATA_HOME} || "$home/.local/share/"),
-        cache => ($ENV{XDG_CACHE_HOME} || "$home/.cache/"),
-        config => ($ENV{XDG_CONFIG_HOME} || "$home/.config/"),
-    );
-
-    return $locations{$type} if exists $locations{$type};
-    croak 'invalid _home requested';
+    return $self;
 }
 
 sub _dirs {
-    my $type = shift;
-
-    my %locations = (
-        data => ($ENV{XDG_DATA_DIRS} || '/usr/local/share:/usr/share'),
-        config => ($ENV{XDG_CONFIG_DIRS} || '/etc/xdg'),
-    );
-
-    return $locations{$type} if exists $locations{$type};
+    my($self, $type) = @_;
+    return $self->{"${type}_dirs"} if exists $self->{"${type}_dirs"};
     croak 'invalid _dirs requested';
 }
 
 sub _lookup_file {
     my ($self, $type, @subpath) = @_;
 
-    unless (@subpath) {
-        croak 'subpath not specified';
-    }
+    croak 'subpath not specified' unless @subpath;
+    croak "invalid type: $type" unless defined $self->{$type};
 
-    my @dirs = (_home($type), split(/:/, _dirs($type)));
+    my @dirs = ($self->{$type}, split(/\Q$Config{path_sep}\E/, $self->_dirs($type)));
     my @paths = map { file($_, @subpath) } @dirs;
     my ($match) = grep { -f $_ } @paths;
 
@@ -136,7 +126,7 @@ Returns the user-specific data directory for the application as a L<Path::Class>
 
 sub data_home {
     my $self = shift;
-    my $xdg = _home('data');
+    my $xdg = $self->{data};
     return dir($xdg, $self->{name});
 }
 
@@ -150,7 +140,7 @@ Returns the user-specific configuration directory for the application as a L<Pat
 
 sub config_home {
     my $self = shift;
-    my $xdg = _home('config');
+    my $xdg = $self->{config};
     return dir($xdg, $self->{name});
 }
 
@@ -164,7 +154,7 @@ Returns the user-specific cache directory for the application as a L<Path::Class
 
 sub cache_home {
     my $self = shift;
-    my $xdg = _home('cache');
+    my $xdg = $self->{cache};
     return dir($xdg, $self->{name});
 }
 
@@ -173,12 +163,13 @@ sub cache_home {
  my $dirs = $xdg->data_dirs;
 
 Returns the system data directories, not modified for the application. Per the
-specification, the returned string is :-delimited.
+specification, the returned string is C<:>-delimited, except on Windows where it
+is C<;>-delimited.
 
 =cut
 
 sub data_dirs {
-    return _dirs('data');
+    return shift->_dirs('data');
 }
 
 =head2 config_dirs
@@ -186,12 +177,13 @@ sub data_dirs {
  my $dirs = $xdg->config_dirs;
 
 Returns the system config directories, not modified for the application. Per
-the specification, the returned string is :-delimited.
+the specification, the returned string is :-delimited, except on Windows where it
+is C<;>-delimited.
 
 =cut
 
 sub config_dirs {
-    return _dirs('config');
+    return shift->_dirs('config');
 }
 
 =head2 lookup_data_file
@@ -230,9 +222,29 @@ sub lookup_config_file {
 
 L<XDG Base Directory specification, version 0.7|http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html>
 
+=head1 CAVEATS
+
+This module intentionally and out of necessity does not follow the spec on the following platforms:
+
+=over 4
+
+=item C<MSWin32> (Strawberry Perl, Visual C++ Perl, etc)
+
+The spec requires C<:> as the path separator, but use of this character is essential for absolute path names in
+Windows, so the Windows Path separator C<;> is used instead.
+
+There are no global data or config directories in windows so the data and config directories are empty list instead of
+the default UNIX locations.
+
+The base directory instead of being the user's home directory is C<%LOCALAPPDATA%>.  Arguably the data and config
+base directory should be C<%APPDATA%>, but cache should definitely be in C<%LOCALAPPDATA%>, and we chose to use just one
+base directory for simplicity.
+
+=back
+
 =head1 ACKNOWLEDGEMENTS
 
-This module's Windows support is made possible by L<File::HomeDir>. I would also like to thank L<Path::Class> and L<File::Spec>.
+I would like to thank L<Path::Class> and L<File::Spec>.
 
 =cut
 
