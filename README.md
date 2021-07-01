@@ -123,10 +123,11 @@ by the specification is used instead. Returns a [Path::Class](https://metacpan.o
 
 This module's Windows support is made possible by [File::HomeDir](https://metacpan.org/pod/File::HomeDir). I would also like to thank [Path::Class](https://metacpan.org/pod/Path::Class) and [File::Spec](https://metacpan.org/pod/File::Spec).
 
-# AUTHORS
+# AUTHOR
 
-- Kiyoshi Aman <kiyoshi.aman@gmail.com>
-- Graham Ollis <plicease@cpan.org>
+Original author: Kiyoshi Aman <kiyoshi.aman@gmail.com>
+
+Current maintainer: Graham Ollis <plicease@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
