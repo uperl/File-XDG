@@ -1,4 +1,4 @@
-# File::XDG ![static](https://github.com/uperl/File-XDG/workflows/static/badge.svg) ![linux](https://github.com/uperl/File-XDG/workflows/linux/badge.svg)
+# File::XDG ![static](https://github.com/uperl/File-XDG/workflows/static/badge.svg) ![linux](https://github.com/uperl/File-XDG/workflows/linux/badge.svg) ![macos](https://github.com/uperl/File-XDG/workflows/macos/badge.svg)
 
 Basic implementation of the XDG base directory specification
 
