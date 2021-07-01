@@ -82,7 +82,8 @@ my $dirs = $xdg->data_dirs;
 ```
 
 Returns the system data directories, not modified for the application. Per the
-specification, the returned string is :-delimited.
+specification, the returned string is `:`-delimited, except on Windows where it
+is `;`-delimited.
 
 ## config\_dirs
 
@@ -91,7 +92,8 @@ my $dirs = $xdg->config_dirs;
 ```
 
 Returns the system config directories, not modified for the application. Per
-the specification, the returned string is :-delimited.
+the specification, the returned string is :-delimited, except on Windows where it
+is `;`-delimited.
 
 ## lookup\_data\_file
 
@@ -119,9 +121,25 @@ by the specification is used instead. Returns a [Path::Class](https://metacpan.o
 
 [XDG Base Directory specification, version 0.7](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html)
 
+# CAVEATS
+
+This module intentionally and out of necessity does not follow the spec on the following platforms:
+
+- `MSWin32` (Strawberry Perl, Visual C++ Perl, etc)
+
+    The spec requires `:` as the path separator, but use of this character is essential for absolute path names in
+    Windows, so the Windows Path separator `;` is used instead.
+
+    There are no global data or config directories in windows so the data and config directories are empty list instead of
+    the default UNIX locations.
+
+    The base directory instead of being the user's home directory is `%LOCALAPPDATA%`.  Arguably the data and config
+    base directory should be `%APPDATA%`, but cache should definitely be in `%LOCALAPPDATA%`, and we chose to use just one
+    base directory for simplicity.
+
 # ACKNOWLEDGEMENTS
 
-This module's Windows support is made possible by [File::HomeDir](https://metacpan.org/pod/File::HomeDir). I would also like to thank [Path::Class](https://metacpan.org/pod/Path::Class) and [File::Spec](https://metacpan.org/pod/File::Spec).
+I would like to thank [Path::Class](https://metacpan.org/pod/Path::Class) and [File::Spec](https://metacpan.org/pod/File::Spec).
 
 # AUTHOR
 
