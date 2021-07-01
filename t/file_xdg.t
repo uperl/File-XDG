@@ -50,12 +50,10 @@ subtest 'lookup' => sub {
   local $ENV{XDG_CONFIG_DIRS} = File::Temp->newdir();
 
   subtest 'data_home' => sub {
-    plan tests => 6;
     test_lookup('data_home', 'data_dirs', 'lookup_data_file');
   };
 
   subtest 'config_home' => sub {
-    plan tests => 6;
     test_lookup('config_home', 'config_dirs', 'lookup_config_file');
   };
 };
