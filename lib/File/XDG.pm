@@ -115,7 +115,7 @@ sub _lookup_file {
         croak 'subpath not specified';
     }
 
-    my @dirs = (_home($type), split(':', _dirs($type)));
+    my @dirs = (_home($type), split(/:/, _dirs($type)));
     my @paths = map { file($_, @subpath) } @dirs;
     my ($match) = grep { -f $_ } @paths;
 
