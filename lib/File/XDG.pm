@@ -2,17 +2,12 @@ package File::XDG;
 
 use strict;
 use warnings;
-
-our $VERSION = '0.04_001';
-
 use Carp qw(croak);
-
 use Path::Class qw(dir file);
 use File::HomeDir;
 
-=head1 NAME
-
-C<File::XDG> - Basic implementation of the XDG base directory specification
+# ABSTRACT: Basic implementation of the XDG base directory specification
+# VERSION:
 
 =head1 SYNOPSIS
 
@@ -224,10 +219,6 @@ L<XDG Base Directory specification, version 0.7|http://standards.freedesktop.org
 =head1 ACKNOWLEDGEMENTS
 
 This module's Windows support is made possible by C<File::HomeDir>. I would also like to thank C<Path::Class> and C<File::Spec>.
-
-=head1 AUTHOR
-
-Kiyoshi Aman <kiyoshi.aman@gmail.com>
 
 =cut
 
