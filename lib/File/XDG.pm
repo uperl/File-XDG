@@ -26,10 +26,10 @@ use if $^O eq 'MSWin32', 'Win32';
  my $path = $xdg->cache_home;
 
  # system config
- my @dirs = split /:/, $xdg->config_dirs;
+ my @dirs = $xdg->config_dirs_list;
 
  # system data
- my @dirs = split /:/, $xdg->data_dirs;
+ my @dirs = $xdg->data_dirs_list;
 
 =head1 DESCRIPTION
 
@@ -166,10 +166,26 @@ Returns the system data directories, not modified for the application. Per the
 specification, the returned string is C<:>-delimited, except on Windows where it
 is C<;>-delimited.
 
+For portability L</data_dirs_list> is preferred.
+
 =cut
 
 sub data_dirs {
     return shift->_dirs('data');
+}
+
+=head2 data_dirs_list
+
+[version 0.06]
+
+ my @dirs = $xdg->data_dirs_list;
+
+Returns the system data directories as a list.
+
+=cut
+
+sub data_dirs_list {
+    return split /\Q$Config{path_sep}\E/, shift->data_dirs;
 }
 
 =head2 config_dirs
@@ -180,10 +196,26 @@ Returns the system config directories, not modified for the application. Per
 the specification, the returned string is :-delimited, except on Windows where it
 is C<;>-delimited.
 
+For portability L</config_dirs_list> is preferred.
+
 =cut
 
 sub config_dirs {
     return shift->_dirs('config');
+}
+
+=head2 config_dirs_list
+
+[version 0.06]
+
+ my @dirs = $xdg->config_dirs_list;
+
+Returns the system config directories as a list.
+
+=cut
+
+sub config_dirs_list {
+    return split /\Q$Config{path_sep}\E/, shift->config_dirs;
 }
 
 =head2 lookup_data_file
@@ -242,9 +274,23 @@ base directory for simplicity.
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
+=head1 SEE ALSO
 
-I would like to thank L<Path::Class> and L<File::Spec>.
+=over 4
+
+=item L<Path::Class>
+
+Portable native path class used by this module.
+
+=item L<Path::Spec>
+
+Core Perl library for working with file and directory paths.
+
+=item L<File::BaseDir>
+
+Provides similar functionality to this module with a different interface.
+
+=back
 
 =cut
 
