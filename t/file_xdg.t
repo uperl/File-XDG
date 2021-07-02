@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use File::XDG;
 use File::Temp;
+use Config;
 use Path::Class qw( dir );
 use File::Path qw(make_path);
 use if $^O eq 'MSWin32', 'Win32';
@@ -16,8 +17,8 @@ subtest 'env' => sub {
   $ENV{XDG_CONFIG_HOME} = '/home/user/.config';
   $ENV{XDG_DATA_HOME} = '/home/user/.local/share';
   $ENV{XDG_CACHE_HOME} = '/home/user/.cache';
-  $ENV{XDG_DATA_DIRS} = '/usr/local/share:/usr/share';
-  $ENV{XDG_CONFIG_DIRS} = '/etc/xdg';
+  $ENV{XDG_DATA_DIRS} = "/usr/local/share$Config{path_sep}/usr/share";
+  $ENV{XDG_CONFIG_DIRS} = "/etc/xdg$Config{path_sep}/foo/bar";
   local $base = "/home/user";
 
   my $xdg = File::XDG->new(name => 'test');
@@ -25,8 +26,11 @@ subtest 'env' => sub {
   is($xdg->config_home, dir($base, '.config/test'), 'user-specific app configuration');
   is($xdg->data_home, dir($base, '.local/share/test'), 'user-specific app data');
   is($xdg->cache_home, dir($base, '.cache/test'), 'user-specific app cache');
-  is($xdg->data_dirs, '/usr/local/share:/usr/share', 'system-wide data directories');
-  is($xdg->config_dirs, '/etc/xdg', 'system-wide configuration directories');
+  is($xdg->data_dirs, "/usr/local/share$Config{path_sep}/usr/share", 'system-wide data directories');
+  is($xdg->config_dirs, "/etc/xdg$Config{path_sep}/foo/bar", 'system-wide configuration directories');
+
+  is_deeply( [$xdg->data_dirs_list], ['/usr/local/share','/usr/share'], 'system-wide data directories as a list');
+  is_deeply( [$xdg->config_dirs_list], ['/etc/xdg','/foo/bar'], 'system-wide configuration directories as a list');
 };
 
 subtest 'noenv' => sub {
@@ -43,11 +47,15 @@ subtest 'noenv' => sub {
     {
       is($xdg->data_dirs, '', 'system-wide data directories');
       is($xdg->config_dirs, '', 'system-wide configuration directories');
+      is_deeply( [$xdg->data_dirs_list], [], 'system-wide data directories as a list');
+      is_deeply( [$xdg->config_dirs_list], [], 'system-wide configuration directories as a list');
     }
     else
     {
       is($xdg->data_dirs, '/usr/local/share:/usr/share', 'system-wide data directories');
       is($xdg->config_dirs, '/etc/xdg', 'system-wide configuration directories');
+      is_deeply( [$xdg->data_dirs_list], ['/usr/local/share','/usr/share'], 'system-wide data directories as a list');
+      is_deeply( [$xdg->config_dirs_list], ['/etc/xdg'], 'system-wide configuration directories as a list');
     }
   }
 };

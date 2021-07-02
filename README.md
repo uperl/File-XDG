@@ -19,10 +19,10 @@ my $path = $xdg->data_home;
 my $path = $xdg->cache_home;
 
 # system config
-my @dirs = split /:/, $xdg->config_dirs;
+my @dirs = $xdg->config_dirs_list;
 
 # system data
-my @dirs = split /:/, $xdg->data_dirs;
+my @dirs = $xdg->data_dirs_list;
 ```
 
 # DESCRIPTION
@@ -85,6 +85,18 @@ Returns the system data directories, not modified for the application. Per the
 specification, the returned string is `:`-delimited, except on Windows where it
 is `;`-delimited.
 
+For portability ["data\_dirs\_list"](#data_dirs_list) is preferred.
+
+## data\_dirs\_list
+
+\[version 0.06\]
+
+```perl
+my @dirs = $xdg->data_dirs_list;
+```
+
+Returns the system data directories as a list.
+
 ## config\_dirs
 
 ```perl
@@ -94,6 +106,18 @@ my $dirs = $xdg->config_dirs;
 Returns the system config directories, not modified for the application. Per
 the specification, the returned string is :-delimited, except on Windows where it
 is `;`-delimited.
+
+For portability ["config\_dirs\_list"](#config_dirs_list) is preferred.
+
+## config\_dirs\_list
+
+\[version 0.06\]
+
+```perl
+my @dirs = $xdg->config_dirs_list;
+```
+
+Returns the system config directories as a list.
 
 ## lookup\_data\_file
 
@@ -137,9 +161,19 @@ This module intentionally and out of necessity does not follow the spec on the f
     base directory should be `%APPDATA%`, but cache should definitely be in `%LOCALAPPDATA%`, and we chose to use just one
     base directory for simplicity.
 
-# ACKNOWLEDGEMENTS
+# SEE ALSO
 
-I would like to thank [Path::Class](https://metacpan.org/pod/Path::Class) and [File::Spec](https://metacpan.org/pod/File::Spec).
+- [Path::Class](https://metacpan.org/pod/Path::Class)
+
+    Portable native path class used by this module.
+
+- [Path::Spec](https://metacpan.org/pod/Path::Spec)
+
+    Core Perl library for working with file and directory paths.
+
+- [File::BaseDir](https://metacpan.org/pod/File::BaseDir)
+
+    Provides similar functionality to this module with a different interface.
 
 # AUTHOR
 
