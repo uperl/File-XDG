@@ -180,12 +180,12 @@ sub data_dirs {
 
  my @dirs = $xdg->data_dirs_list;
 
-Returns the system data directories as a list.
+Returns the system data directories as a list of L<Path::Class> objects.
 
 =cut
 
 sub data_dirs_list {
-    return split /\Q$Config{path_sep}\E/, shift->data_dirs;
+    return map { dir($_) } split /\Q$Config{path_sep}\E/, shift->data_dirs;
 }
 
 =head2 config_dirs
@@ -210,12 +210,12 @@ sub config_dirs {
 
  my @dirs = $xdg->config_dirs_list;
 
-Returns the system config directories as a list.
+Returns the system config directories as a list of L<Path::Class> objects.
 
 =cut
 
 sub config_dirs_list {
-    return split /\Q$Config{path_sep}\E/, shift->config_dirs;
+    return map { dir($_) } split /\Q$Config{path_sep}\E/, shift->config_dirs;
 }
 
 =head2 lookup_data_file

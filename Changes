@@ -3,7 +3,7 @@ Revision history for {{$dist->name}}
 {{$NEXT}}
   - Remove dependency on File::HomeDir (gh#7)
   - Fix tests on Windows (gh#5, gh#7)
-  - Add data_dirs_list and config_dirs_list methods (gh#8)
+  - Add data_dirs_list and config_dirs_list methods (gh#8, gh#9)
 
 0.05      2021-07-01 14:29:45 -0600
   - Added Changes file for future changes

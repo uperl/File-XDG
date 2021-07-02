@@ -95,7 +95,7 @@ For portability ["data\_dirs\_list"](#data_dirs_list) is preferred.
 my @dirs = $xdg->data_dirs_list;
 ```
 
-Returns the system data directories as a list.
+Returns the system data directories as a list of [Path::Class](https://metacpan.org/pod/Path::Class) objects.
 
 ## config\_dirs
 
@@ -117,7 +117,7 @@ For portability ["config\_dirs\_list"](#config_dirs_list) is preferred.
 my @dirs = $xdg->config_dirs_list;
 ```
 
-Returns the system config directories as a list.
+Returns the system config directories as a list of [Path::Class](https://metacpan.org/pod/Path::Class) objects.
 
 ## lookup\_data\_file
 
