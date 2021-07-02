@@ -29,8 +29,8 @@ subtest 'env' => sub {
   is($xdg->data_dirs, "/usr/local/share$Config{path_sep}/usr/share", 'system-wide data directories');
   is($xdg->config_dirs, "/etc/xdg$Config{path_sep}/foo/bar", 'system-wide configuration directories');
 
-  is_deeply( [$xdg->data_dirs_list], ['/usr/local/share','/usr/share'], 'system-wide data directories as a list');
-  is_deeply( [$xdg->config_dirs_list], ['/etc/xdg','/foo/bar'], 'system-wide configuration directories as a list');
+  is_deeply( [$xdg->data_dirs_list], [dir('/usr/local/share'),dir('/usr/share')], 'system-wide data directories as a list');
+  is_deeply( [$xdg->config_dirs_list], [dir('/etc/xdg'),dir('/foo/bar')], 'system-wide configuration directories as a list');
 };
 
 subtest 'noenv' => sub {
