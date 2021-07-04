@@ -177,13 +177,13 @@ This module intentionally and out of necessity does not follow the spec on the f
 
 # AUTHOR
 
-Original author: Kiyoshi Aman <kiyoshi.aman@gmail.com>
+Original author: Síle Ekaterin Aman
 
 Current maintainer: Graham Ollis <plicease@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2021 by Kiyoshi Aman <kiyoshi.aman@gmail.com>.
+This software is copyright (c) 2012-2021 by Síle Ekaterin Aman.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
