@@ -70,7 +70,7 @@ sub new {
     my $name = delete $args{name};
     croak('application name required') unless defined $name;
 
-    corak("unknown arguments: @{[ sort keys %args ]}") if %args;
+    croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
         name => $name,
