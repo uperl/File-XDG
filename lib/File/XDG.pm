@@ -2,7 +2,7 @@ package File::XDG;
 
 use strict;
 use warnings;
-use Carp qw(croak);
+use Carp ();
 use Config;
 use if $^O eq 'MSWin32', 'Win32';
 
@@ -24,7 +24,7 @@ use if $^O eq 'MSWin32', 'Win32';
  # user cache
  my $path = $xdg->cache_home;
  
- # system config
+ # system $config
  my @dirs = $xdg->config_dirs_list;
  
  # system data
@@ -104,7 +104,7 @@ sub new {
     my %args = (@_);
 
     my $name = delete $args{name};
-    croak('application name required') unless defined $name;
+    Carp::croak('application name required') unless defined $name;
 
     my $api = delete $args{api};
     $api = 0 unless defined $api;
@@ -134,7 +134,7 @@ sub new {
       Carp::croak("Unknown path class: $path_class");
     }
 
-    croak("unknown arguments: @{[ sort keys %args ]}") if %args;
+    Carp::croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
         name       => $name,
@@ -175,14 +175,14 @@ sub _file {
 sub _dirs {
     my($self, $type) = @_;
     return $self->{"${type}_dirs"} if exists $self->{"${type}_dirs"};
-    croak 'invalid _dirs requested';
+    Carp::croak('invalid _dirs requested');
 }
 
 sub _lookup_file {
     my ($self, $type, @subpath) = @_;
 
-    croak 'subpath not specified' unless @subpath;
-    croak "invalid type: $type" unless defined $self->{$type};
+    Carp::croak('subpath not specified') unless @subpath;
+    Carp::croak("invalid type: $type") unless defined $self->{$type};
 
     my @dirs = ($self->{$type}, split(/\Q$Config{path_sep}\E/, $self->_dirs($type)));
     my @paths = map { $self->_file($_, @subpath) } @dirs;

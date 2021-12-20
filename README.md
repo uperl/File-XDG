@@ -18,7 +18,7 @@ my $path = $xdg->data_home;
 # user cache
 my $path = $xdg->cache_home;
 
-# system config
+# system $config
 my @dirs = $xdg->config_dirs_list;
 
 # system data
