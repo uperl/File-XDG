@@ -9,6 +9,7 @@ pod_spelling_system:
    - FDO
    - XDG
    - Aman
+   - api
 
 pod_coverage:
   skip: 0

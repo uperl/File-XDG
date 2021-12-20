@@ -77,28 +77,73 @@ subtest 'lookup' => sub {
 sub test_lookup {
   my ($home_m, $dirs_m, $lookup_m) = @_;
 
-  my $name = 'test';
-  my $xdg = File::XDG->new(name => $name);
+  subtest 'api = 0' => sub {
 
-  my @subpath = ('subdir', 'filename');
-  my $home = ($xdg->$home_m =~ /(.*)$name/)[0];
-  my $dir  = $xdg->$dirs_m;
+    my $name = 'test';
+    my $xdg = File::XDG->new(name => $name);
 
-  make_file($home, @subpath);
-  make_file($dir, @subpath);
+    my @subpath = ('subdir', 'filename');
+    my $home = ($xdg->$home_m =~ /(.*)$name/)[0];
+    my $dir  = $xdg->$dirs_m;
 
-  my $home_file = File::Spec->join($home, @subpath);
-  my $dir_file = File::Spec->join($dir, @subpath);
+    make_file($home, @subpath);
+    make_file($dir, @subpath);
 
-  ok(-f $home_file, "created file in $home_m");
-  ok(-f $dir_file, "created file in $dirs_m");
+    my $home_file = File::Spec->join($home, @subpath);
+    my $dir_file = File::Spec->join($dir, @subpath);
 
-  isnt($home_file, $dir_file, "created distinct files in $home_m and $dirs_m");
-  is($xdg->$lookup_m(@subpath), $home_file, "lookup found file in $home_m");
-  unlink($home_file);
-  is($xdg->$lookup_m(@subpath), $dir_file, "after removing file in $home_m, lookup found file in $dirs_m");
-  unlink($dir_file);
-  is($xdg->$lookup_m(@subpath), undef, "after removing file in $dirs_m, lookup did not find file");
+    ok(-f $home_file, "created file in $home_m");
+    ok(-f $dir_file, "created file in $dirs_m");
+
+    isnt($home_file, $dir_file, "created distinct files in $home_m and $dirs_m");
+    is($xdg->$lookup_m(@subpath), $home_file, "lookup found file in $home_m");
+    unlink($home_file);
+    is($xdg->$lookup_m(@subpath), $dir_file, "after removing file in $home_m, lookup found file in $dirs_m");
+    unlink($dir_file);
+    is($xdg->$lookup_m(@subpath), undef, "after removing file in $dirs_m, lookup did not find file");
+  };
+
+  subtest 'api = 1' => sub {
+
+    my $name = 'test';
+    my @warn;
+
+    my $xdg = do {
+      local $SIG{__WARN__} = sub {
+        if($_[0] =~ /^Note: experimental use of api = 1/)
+        {
+          push @warn, $_[0] if $_[0] =~ /^Note: experimental use of api = 1/;
+        }
+        else
+        {
+          CORE::warn(@_);
+        }
+      };
+      File::XDG->new(name => $name, api => 1);
+    };
+
+    is scalar(@warn), 1, 'exactly one warning about experimental api';
+
+    my @subpath = ($name, 'filename');
+    my $home = ($xdg->$home_m =~ /(.*)$name/)[0];
+    my $dir  = $xdg->$dirs_m;
+
+    make_file($home, @subpath);
+    make_file($dir, @subpath);
+
+    my $home_file = File::Spec->join($home, @subpath);
+    my $dir_file = File::Spec->join($dir, @subpath);
+
+    ok(-f $home_file, "created file in $home_m");
+    ok(-f $dir_file, "created file in $dirs_m");
+
+    isnt($home_file, $dir_file, "created distinct files in $home_m and $dirs_m");
+    is($xdg->$lookup_m($subpath[-1]), $home_file, "lookup found file in $home_m");
+    unlink($home_file);
+    is($xdg->$lookup_m($subpath[-1]), $dir_file, "after removing file in $home_m, lookup found file in $dirs_m");
+    unlink($dir_file);
+    is($xdg->$lookup_m($subpath[-1]), undef, "after removing file in $dirs_m, lookup did not find file");
+  };
 }
 
 sub make_file {
