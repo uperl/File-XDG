@@ -5,6 +5,7 @@ use File::XDG;
 use File::Temp;
 use Config;
 use Path::Class qw( dir );
+use Path::Tiny qw( path );
 use File::Path qw(make_path);
 use if $^O eq 'MSWin32', 'Win32';
 
@@ -74,6 +75,54 @@ subtest 'lookup' => sub {
   };
 };
 
+subtest 'api' => sub {
+
+  my $dir = path(__FILE__)->parent->stringify;
+
+  subtest 'api = 0' => sub {
+    my $xdg = File::XDG->new(name => 'foo');
+    isa_ok($xdg->_file(__FILE__), 'Path::Class::File');
+    isa_ok($xdg->_dir($dir), 'Path::Class::Dir');
+  };
+
+  subtest 'api = 1' => sub {
+    my $xdg = do {
+      local $SIG{__WARN__} = sub {
+        if($_[0] =~ /^Note: experimental use of api = 1/)
+        {
+          note $_[0];
+        }
+        else
+        {
+          CORE::warn(@_);
+        }
+      };
+      File::XDG->new(name => 'foo', api => 1);
+    };
+    isa_ok($xdg->_file(__FILE__), 'Path::Tiny');
+    isa_ok($xdg->_dir($dir), 'Path::Tiny');
+  };
+
+};
+
+subtest 'path_class' => sub {
+
+  my $dir = path(__FILE__)->parent->stringify;
+
+  subtest 'Path::Class' => sub {
+    my $xdg = File::XDG->new(name => 'foo', path_class => 'Path::Class');
+    isa_ok($xdg->_file(__FILE__), 'Path::Class::File');
+    isa_ok($xdg->_dir($dir), 'Path::Class::Dir');
+  };
+
+  subtest 'Path::Tiny' => sub {
+    my $xdg = File::XDG->new(name => 'foo', path_class => 'Path::Tiny');
+    isa_ok($xdg->_file(__FILE__), 'Path::Tiny');
+    isa_ok($xdg->_dir($dir), 'Path::Tiny');
+  };
+
+};
+
 sub test_lookup {
   my ($home_m, $dirs_m, $lookup_m) = @_;
 
@@ -131,8 +180,8 @@ sub test_lookup {
     make_file($home, @subpath);
     make_file($dir, @subpath);
 
-    my $home_file = File::Spec->join($home, @subpath);
-    my $dir_file = File::Spec->join($dir, @subpath);
+    my $home_file = path($home, @subpath)->stringify;
+    my $dir_file = path($dir, @subpath)->stringify;
 
     ok(-f $home_file, "created file in $home_m");
     ok(-f $dir_file, "created file in $dirs_m");

@@ -1,9 +1,13 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Added option path_class (gh#16, gh#17)
+  - Added option api (gh#17)
   - New experimental API (api => 1)
     - lookup_config_file and lookup_data_file will use the name passed
       to the constructor, rather than passed to the method (gh#14, gh#17)
+    - Methods that return a path will return a Path::Tiny object instead
+      of a Path::Class object by default (gh#16, gh#17)
     - Experimental API will issue a warning, until it becomes stable
       (on the release of 1.00) (gh#17)
 

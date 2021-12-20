@@ -45,10 +45,6 @@ application name as the ["name"](#name) argument.
 
 Takes the following named arguments:
 
-- name
-
-    Name of the application for which File::XDG is being used.
-
 - api
 
     The API version to use.
@@ -63,6 +59,25 @@ Takes the following named arguments:
         until version `1.00` is released.  At this point the version 1 API will
         be stable.
 
+- name
+
+    Name of the application for which File::XDG is being used.
+
+- path\_class
+
+    The path class to return
+
+    - [Path::Class](https://metacpan.org/pod/Path::Class)
+
+        This is the default with api = 0.  All methods that return a file will return
+        an instance of [Path::Class::File](https://metacpan.org/pod/Path::Class::File) and all methods that return a directory will
+        return an instance of [Path::Class::Dir](https://metacpan.org/pod/Path::Class::Dir).
+
+    - [Path::Tiny](https://metacpan.org/pod/Path::Tiny)
+
+        This is the default with api = 1.  All methods that return a file will return
+        an instance of [Path::Tiny](https://metacpan.org/pod/Path::Tiny).
+
 # METHODS
 
 ## data\_home
@@ -71,7 +86,7 @@ Takes the following named arguments:
 my $path = $xdg->data_home;
 ```
 
-Returns the user-specific data directory for the application as a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+Returns the user-specific data directory for the application as a path class object.
 
 ## config\_home
 
@@ -79,7 +94,7 @@ Returns the user-specific data directory for the application as a [Path::Class](
 my $path = $xdg->config_home;
 ```
 
-Returns the user-specific configuration directory for the application as a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+Returns the user-specific configuration directory for the application as a path class object.
 
 ## cache\_home
 
@@ -87,7 +102,7 @@ Returns the user-specific configuration directory for the application as a [Path
 my $path = $xdg->cache_home;
 ```
 
-Returns the user-specific cache directory for the application as a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+Returns the user-specific cache directory for the application as a path class object.
 
 ## data\_dirs
 
@@ -109,7 +124,7 @@ For portability ["data\_dirs\_list"](#data_dirs_list) is preferred.
 my @dirs = $xdg->data_dirs_list;
 ```
 
-Returns the system data directories as a list of [Path::Class](https://metacpan.org/pod/Path::Class) objects.
+Returns the system data directories as a list of path class objects.
 
 ## config\_dirs
 
@@ -131,7 +146,7 @@ For portability ["config\_dirs\_list"](#config_dirs_list) is preferred.
 my @dirs = $xdg->config_dirs_list;
 ```
 
-Returns the system config directories as a list of [Path::Class](https://metacpan.org/pod/Path::Class) objects.
+Returns the system config directories as a list of path class objects.
 
 ## lookup\_data\_file
 
@@ -143,7 +158,7 @@ my $path = $xdg->lookup_data_file($subdir, $filename);
 Looks up the data file by searching for `./$subdir/$filename` relative to all base
 directories indicated by `$XDG_DATA_HOME` and `$XDG_DATA_DIRS`. If an environment
 variable is either not set or empty, its default value as defined by the
-specification is used instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+specification is used instead. Returns a path class object.
 
 ```perl
 # api = 1
@@ -154,7 +169,7 @@ Looks up the data file by searching for `./$name/$filename` (where `$name` is
 provided by the constructor) relative to all base directories indicated by
 `$XDG_DATA_HOME` and `$XDG_DATA_DIRS`. If an environment variable is either
 not set or empty, its default value as defined by the specification is used
-instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+instead. Returns a path class object.
 
 ## lookup\_config\_file
 
@@ -166,7 +181,7 @@ my $path = $xdg->lookup_config_file($subdir, $filename);
 Looks up the configuration file by searching for `./$subdir/$filename` relative to
 all base directories indicated by `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an
 environment variable is either not set or empty, its default value as defined
-by the specification is used instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+by the specification is used instead. Returns a path class object.
 
 ```perl
 # api = 1
@@ -177,7 +192,7 @@ Looks up the configuration file by searching for `./$name/$filename` (where `$na
 provided by the constructor) relative to all base directories indicated by
 `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an environment variable is
 either not set or empty, its default value as defined by the specification
-is used instead. Returns a [Path::Class](https://metacpan.org/pod/Path::Class) object.
+is used instead. Returns a path class object.
 
 # SEE ALSO
 
@@ -203,7 +218,11 @@ This module intentionally and out of necessity does not follow the spec on the f
 
 - [Path::Class](https://metacpan.org/pod/Path::Class)
 
-    Portable native path class used by this module.
+    Portable native path class used by this module used by default (api = 0) and optionally (api = 1).
+
+- [Path::Tiny](https://metacpan.org/pod/Path::Tiny)
+
+    Smaller lighter weight path class used optionally (api = 0) and by default (api = 1).
 
 - [Path::Spec](https://metacpan.org/pod/Path::Spec)
 
