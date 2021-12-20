@@ -121,6 +121,12 @@ subtest 'path_class' => sub {
     isa_ok($xdg->_dir($dir), 'Path::Tiny');
   };
 
+  subtest 'coderef' => sub {
+    my $xdg = File::XDG->new(name => 'foo', path_class => sub { \@_ });
+    isa_ok($xdg->_file(__FILE__), 'ARRAY');
+    isa_ok($xdg->_dir($dir), 'ARRAY');
+  };
+
 };
 
 sub test_lookup {
