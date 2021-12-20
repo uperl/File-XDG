@@ -3,7 +3,6 @@ package File::XDG;
 use strict;
 use warnings;
 use Carp qw(croak);
-use Path::Class qw(dir file);
 use Config;
 use if $^O eq 'MSWin32', 'Win32';
 
@@ -55,10 +54,6 @@ Takes the following named arguments:
 
 =over 4
 
-=item name
-
-Name of the application for which File::XDG is being used.
-
 =item api
 
 The API version to use.
@@ -74,6 +69,29 @@ The default and original API version.
 Currently experimental API version.  This will issue a warning when invoked
 until version C<1.00> is released.  At this point the version 1 API will
 be stable.
+
+=back
+
+=item name
+
+Name of the application for which File::XDG is being used.
+
+=item path_class
+
+The path class to return
+
+=over 4
+
+=item L<Path::Class>
+
+This is the default with api = 0.  All methods that return a file will return
+an instance of L<Path::Class::File> and all methods that return a directory will
+return an instance of L<Path::Class::Dir>.
+
+=item L<Path::Tiny>
+
+This is the default with api = 1.  All methods that return a file will return
+an instance of L<Path::Tiny>.
 
 =back
 
@@ -93,11 +111,36 @@ sub new {
     Carp::carp("Note: experimental use of api = 1") if $api == 1;
     Carp::croak("Unsupported api = $api") unless $api == 0 || $api == 1;
 
+    my $path_class = delete $args{path_class};
+    unless(defined $path_class) {
+      if($api >= 1) {
+        $path_class = 'Path::Tiny';
+      } else {
+        $path_class = 'Path::Class';
+      }
+    }
+
+    if($path_class eq 'Path::Tiny')
+    {
+      require Path::Tiny;
+    }
+    elsif($path_class eq 'Path::Class')
+    {
+      require Path::Class::File;
+      require Path::Class::Dir;
+    }
+    else
+    {
+      Carp::croak("Unknown path class: $path_class");
+    }
+
     croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
-        name => $name,
-        api  => $api,
+        name       => $name,
+        api        => $api,
+        file_class => $path_class eq 'Path::Class' ? 'Path::Class::File' : $path_class,
+        dir_class  => $path_class eq 'Path::Class' ? 'Path::Class::Dir'  : $path_class,
     }, $class;
 
     if($^O eq 'MSWin32') {
@@ -119,6 +162,16 @@ sub new {
     return $self;
 }
 
+sub _dir {
+    my $self = shift;
+    $self->{dir_class}->new(@_);
+}
+
+sub _file {
+    my $self = shift;
+    $self->{file_class}->new(@_);
+}
+
 sub _dirs {
     my($self, $type) = @_;
     return $self->{"${type}_dirs"} if exists $self->{"${type}_dirs"};
@@ -132,7 +185,7 @@ sub _lookup_file {
     croak "invalid type: $type" unless defined $self->{$type};
 
     my @dirs = ($self->{$type}, split(/\Q$Config{path_sep}\E/, $self->_dirs($type)));
-    my @paths = map { file($_, @subpath) } @dirs;
+    my @paths = map { $self->_file($_, @subpath) } @dirs;
     my ($match) = grep { -f $_ } @paths;
 
     return $match;
@@ -144,42 +197,42 @@ sub _lookup_file {
 
  my $path = $xdg->data_home;
 
-Returns the user-specific data directory for the application as a L<Path::Class> object.
+Returns the user-specific data directory for the application as a path class object.
 
 =cut
 
 sub data_home {
     my $self = shift;
     my $xdg = $self->{data};
-    return dir($xdg, $self->{name});
+    return $self->_dir($xdg, $self->{name});
 }
 
 =head2 config_home
 
  my $path = $xdg->config_home;
 
-Returns the user-specific configuration directory for the application as a L<Path::Class> object.
+Returns the user-specific configuration directory for the application as a path class object.
 
 =cut
 
 sub config_home {
     my $self = shift;
     my $xdg = $self->{config};
-    return dir($xdg, $self->{name});
+    return $self->_dir($xdg, $self->{name});
 }
 
 =head2 cache_home
 
  my $path = $xdg->cache_home;
 
-Returns the user-specific cache directory for the application as a L<Path::Class> object.
+Returns the user-specific cache directory for the application as a path class object.
 
 =cut
 
 sub cache_home {
     my $self = shift;
     my $xdg = $self->{cache};
-    return dir($xdg, $self->{name});
+    return $self->_dir($xdg, $self->{name});
 }
 
 =head2 data_dirs
@@ -204,12 +257,13 @@ sub data_dirs {
 
  my @dirs = $xdg->data_dirs_list;
 
-Returns the system data directories as a list of L<Path::Class> objects.
+Returns the system data directories as a list of path class objects.
 
 =cut
 
 sub data_dirs_list {
-    return map { dir($_) } split /\Q$Config{path_sep}\E/, shift->data_dirs;
+    my $self = shift;
+    return map { $self->_dir($_) } split /\Q$Config{path_sep}\E/, $self->data_dirs;
 }
 
 =head2 config_dirs
@@ -234,12 +288,13 @@ sub config_dirs {
 
  my @dirs = $xdg->config_dirs_list;
 
-Returns the system config directories as a list of L<Path::Class> objects.
+Returns the system config directories as a list of path class objects.
 
 =cut
 
 sub config_dirs_list {
-    return map { dir($_) } split /\Q$Config{path_sep}\E/, shift->config_dirs;
+    my $self = shift;
+    return map { $self->_dir($_) } split /\Q$Config{path_sep}\E/, $self->config_dirs;
 }
 
 =head2 lookup_data_file
@@ -250,7 +305,7 @@ sub config_dirs_list {
 Looks up the data file by searching for C<./$subdir/$filename> relative to all base
 directories indicated by C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment
 variable is either not set or empty, its default value as defined by the
-specification is used instead. Returns a L<Path::Class> object.
+specification is used instead. Returns a path class object.
 
  # api = 1
  my $path = $xdg->lookup_data_File($filename);
@@ -259,7 +314,7 @@ Looks up the data file by searching for C<./$name/$filename> (where C<$name> is
 provided by the constructor) relative to all base directories indicated by
 C<$XDG_DATA_HOME> and C<$XDG_DATA_DIRS>. If an environment variable is either
 not set or empty, its default value as defined by the specification is used
-instead. Returns a L<Path::Class> object.
+instead. Returns a path class object.
 
 =cut
 
@@ -277,7 +332,7 @@ sub lookup_data_file {
 Looks up the configuration file by searching for C<./$subdir/$filename> relative to
 all base directories indicated by C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an
 environment variable is either not set or empty, its default value as defined
-by the specification is used instead. Returns a L<Path::Class> object.
+by the specification is used instead. Returns a path class object.
 
  # api = 1
  my $path = $xdg->lookup_config_file($filename);
@@ -286,7 +341,7 @@ Looks up the configuration file by searching for C<./$name/$filename> (where C<$
 provided by the constructor) relative to all base directories indicated by
 C<$XDG_CONFIG_HOME> and C<$XDG_CONFIG_DIRS>. If an environment variable is
 either not set or empty, its default value as defined by the specification
-is used instead. Returns a L<Path::Class> object.
+is used instead. Returns a path class object.
 
 =cut
 
@@ -326,7 +381,11 @@ base directory for simplicity.
 
 =item L<Path::Class>
 
-Portable native path class used by this module.
+Portable native path class used by this module used by default (api = 0) and optionally (api = 1).
+
+=item L<Path::Tiny>
+
+Smaller lighter weight path class used optionally (api = 0) and by default (api = 1).
 
 =item L<Path::Spec>
 
