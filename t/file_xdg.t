@@ -127,6 +127,12 @@ subtest 'path_class' => sub {
     isa_ok($xdg->_dir($dir), 'ARRAY');
   };
 
+  subtest 'arrayref' => sub {
+    my $xdg = File::XDG->new(name => 'foo', path_class => [ sub { 1 }, sub { 2 } ]);
+    is($xdg->_file(__FILE__), 1);
+    is($xdg->_dir($dir), 2);
+  };
+
 };
 
 sub test_lookup {
