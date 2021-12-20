@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use File::XDG;
 use File::Temp;
+use File::Spec;
 use Config;
 use Path::Class qw( dir );
 use Path::Tiny qw( path );
@@ -119,6 +120,12 @@ subtest 'path_class' => sub {
     my $xdg = File::XDG->new(name => 'foo', path_class => 'Path::Tiny');
     isa_ok($xdg->_file(__FILE__), 'Path::Tiny');
     isa_ok($xdg->_dir($dir), 'Path::Tiny');
+  };
+
+  subtest 'File::Spec' => sub {
+    my $xdg = File::XDG->new(name => 'foo', path_class => 'File::Spec');
+    is($xdg->_file(__FILE__), File::Spec->catfile(__FILE__));
+    is($xdg->_dir($dir), File::Spec->catdir($dir));
   };
 
   subtest 'coderef' => sub {
