@@ -78,15 +78,36 @@ Takes the following named arguments:
         This is the default with api = 1.  All methods that return a file will return
         an instance of [Path::Tiny](https://metacpan.org/pod/Path::Tiny).
 
-    - CODEREF
+    - `CODEREF`
 
         If a code reference is passed in then this will be called in order to construct
         the path class.  This allows rolling your own customer path class objects.
         Example:
 
         ```perl
-        # equivalent to path_class => 'Path::Tiny'
-        my $xdg = File::XDG->new( name => 'foo', path_class => sub { Path::Tiny->new(@_) );
+        my $xdg = File::XDG->new(
+          name => 'foo',
+          # equivalent to path_class => 'Path::Tiny'
+          path_class => sub { Path::Tiny->new(@_),
+        );
+        ```
+
+    - `ARRAY`
+
+        Similar to passing a code reference, an array reference with two code references
+        means the first code reference will be used for file paths and the second will
+        be used for directory paths.  This is for path classes that differentiate
+        between files and directories.
+
+        ```perl
+        # equivalent to path_class => 'Path::Class'
+        my $xdg = File::XDG->new(
+          name => 'foo',
+          path_class => [
+            sub { Path::Class::File->new(@_) ),
+            sub { Path::Class::Dir->new(@_) },
+          ],
+        );
         ```
 
 # METHODS

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 use Config;
-use Ref::Util qw( is_coderef );
+use Ref::Util qw( is_coderef is_arrayref );
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
@@ -94,14 +94,33 @@ return an instance of L<Path::Class::Dir>.
 This is the default with api = 1.  All methods that return a file will return
 an instance of L<Path::Tiny>.
 
-=item CODEREF
+=item C<CODEREF>
 
 If a code reference is passed in then this will be called in order to construct
 the path class.  This allows rolling your own customer path class objects.
 Example:
 
- # equivalent to path_class => 'Path::Tiny'
- my $xdg = File::XDG->new( name => 'foo', path_class => sub { Path::Tiny->new(@_) );
+ my $xdg = File::XDG->new(
+   name => 'foo',
+   # equivalent to path_class => 'Path::Tiny'
+   path_class => sub { Path::Tiny->new(@_),
+ );
+
+=item C<ARRAY>
+
+Similar to passing a code reference, an array reference with two code references
+means the first code reference will be used for file paths and the second will
+be used for directory paths.  This is for path classes that differentiate
+between files and directories.
+
+ # equivalent to path_class => 'Path::Class'
+ my $xdg = File::XDG->new(
+   name => 'foo',
+   path_class => [
+     sub { Path::Class::File->new(@_) ),
+     sub { Path::Class::Dir->new(@_) },
+   ],
+ );
 
 =back
 
@@ -137,6 +156,10 @@ sub new {
     if(is_coderef($path_class))
     {
       $dir_class = $file_class = $path_class;
+    }
+    elsif(is_arrayref($path_class))
+    {
+      ($file_class, $dir_class) = @$path_class;
     }
     elsif($path_class eq 'Path::Tiny')
     {
