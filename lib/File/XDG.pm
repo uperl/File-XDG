@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 use Config;
+use Ref::Util qw( is_coderef );
 use if $^O eq 'MSWin32', 'Win32';
 
 # ABSTRACT: Basic implementation of the XDG base directory specification
@@ -93,6 +94,15 @@ return an instance of L<Path::Class::Dir>.
 This is the default with api = 1.  All methods that return a file will return
 an instance of L<Path::Tiny>.
 
+=item CODEREF
+
+If a code reference is passed in then this will be called in order to construct
+the path class.  This allows rolling your own customer path class objects.
+Example:
+
+ # equivalent to path_class => 'Path::Tiny'
+ my $xdg = File::XDG->new( name => 'foo', path_class => sub { Path::Tiny->new(@_) );
+
 =back
 
 =back
@@ -112,6 +122,7 @@ sub new {
     Carp::croak("Unsupported api = $api") unless $api == 0 || $api == 1;
 
     my $path_class = delete $args{path_class};
+
     unless(defined $path_class) {
       if($api >= 1) {
         $path_class = 'Path::Tiny';
@@ -120,7 +131,14 @@ sub new {
       }
     }
 
-    if($path_class eq 'Path::Tiny')
+    my $file_class = $path_class eq 'Path::Class' ? 'Path::Class::File' : $path_class;
+    my $dir_class  = $path_class eq 'Path::Class' ? 'Path::Class::Dir'  : $path_class;
+
+    if(is_coderef($path_class))
+    {
+      $dir_class = $file_class = $path_class;
+    }
+    elsif($path_class eq 'Path::Tiny')
     {
       require Path::Tiny;
     }
@@ -139,8 +157,8 @@ sub new {
     my $self = bless {
         name       => $name,
         api        => $api,
-        file_class => $path_class eq 'Path::Class' ? 'Path::Class::File' : $path_class,
-        dir_class  => $path_class eq 'Path::Class' ? 'Path::Class::Dir'  : $path_class,
+        file_class => $file_class,
+        dir_class  => $dir_class,
     }, $class;
 
     if($^O eq 'MSWin32') {
@@ -163,13 +181,17 @@ sub new {
 }
 
 sub _dir {
-    my $self = shift;
-    $self->{dir_class}->new(@_);
+  my $self = shift;
+  is_coderef($self->{dir_class})
+    ? $self->{dir_class}->(@_)
+    : $self->{dir_class}->new(@_);
 }
 
 sub _file {
-    my $self = shift;
-    $self->{file_class}->new(@_);
+  my $self = shift;
+  is_coderef($self->{dir_class})
+    ? $self->{file_class}->(@_)
+    : $self->{file_class}->new(@_);
 }
 
 sub _dirs {

@@ -15,6 +15,7 @@ $modules{$_} = $_ for qw(
   File::Temp
   Path::Class
   Path::Tiny
+  Ref::Util
   Test::More
 );
 
