@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+0.09_01   2021-12-27 12:58:16 -0700
   - Added option path_class (gh#16, gh#17)
   - Added option api (gh#17)
   - New experimental API (api => 1)
