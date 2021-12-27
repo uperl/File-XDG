@@ -62,10 +62,26 @@ subtest 'noenv' => sub {
   }
 };
 
+subtest 'exe_dir' => sub {
+  my $home = File::Temp->newdir;
+  local $ENV{HOME} = $home;
+  local *Win32::GetFolderPath = sub { return $home };
+
+  my $xdg = File::XDG->new( name => 'foo' );
+
+  is($xdg->exe_dir, undef);
+
+  mkdir "$ENV{HOME}/.local" or die;
+  mkdir "$ENV{HOME}/.local/bin" or die;
+
+  ok(-d $xdg->exe_dir);
+};
+
 subtest 'lookup' => sub {
-  local $ENV{HOME} = File::Temp->newdir();
-  local $ENV{XDG_DATA_DIRS} = File::Temp->newdir();
-  local $ENV{XDG_CONFIG_DIRS} = File::Temp->newdir();
+  my $data   = File::Temp->newdir;
+  my $config = File::Temp->newdir;
+  local $ENV{XDG_DATA_DIRS}   = $data;
+  local $ENV{XDG_CONFIG_DIRS} = $config;
 
   subtest 'data_home' => sub {
     test_lookup('data_home', 'data_dirs', 'lookup_data_file');
