@@ -57,6 +57,8 @@ Takes the following named arguments:
 
 =item api
 
+[version 0.09]
+
 The API version to use.
 
 =over 4
@@ -78,6 +80,8 @@ be stable.
 Name of the application for which File::XDG is being used.
 
 =item path_class
+
+[version 0.09]
 
 The path class to return
 
@@ -196,6 +200,7 @@ sub new {
 
     if($^O eq 'MSWin32') {
         my $local = Win32::GetFolderPath(Win32::CSIDL_LOCAL_APPDATA(), 1);
+        $self->{home}        = $local;
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$local\\.local\\share\\";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$local\\.cache\\";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$local\\.config\\";
@@ -203,6 +208,7 @@ sub new {
         $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '';
     } else {
         my $home = $ENV{HOME} || [getpwuid($>)]->[7];
+        $self->{home}        = $home;
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$home/.local/share/";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$home/.cache/";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$home/.config/";
@@ -350,6 +356,26 @@ Returns the system config directories as a list of path class objects.
 sub config_dirs_list {
     my $self = shift;
     return map { $self->_dir($_) } split /\Q$Config{path_sep}\E/, $self->config_dirs;
+}
+
+=head2 exe_dir
+
+[version 0.10]
+
+ my $exe = $xdg->exe_dir;
+
+Returns the user-specific executable files directory C<$HOME/.local/bin>, if it exists.  If it
+does not exist then C<undef> will be returned.  This directory I<should> be added to the C<PATH>
+according to the spec.
+
+=cut
+
+sub exe_dir
+{
+  my($self) = @_;
+  -d "@{[ $self->{home} ]}/.local/bin"
+  ? $self->_dir($self->{home}, '.local', 'bin')
+  : undef;
 }
 
 =head2 lookup_data_file

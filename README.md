@@ -47,6 +47,8 @@ Takes the following named arguments:
 
 - api
 
+    \[version 0.09\]
+
     The API version to use.
 
     - api = 0
@@ -64,6 +66,8 @@ Takes the following named arguments:
     Name of the application for which File::XDG is being used.
 
 - path\_class
+
+    \[version 0.09\]
 
     The path class to return
 
@@ -183,6 +187,18 @@ my @dirs = $xdg->config_dirs_list;
 ```
 
 Returns the system config directories as a list of path class objects.
+
+## exe\_dir
+
+\[version 0.10\]
+
+```perl
+my $exe = $xdg->exe_dir;
+```
+
+Returns the user-specific executable files directory `$HOME/.local/bin`, if it exists.  If it
+does not exist then `undef` will be returned.  This directory _should_ be added to the `PATH`
+according to the spec.
 
 ## lookup\_data\_file
 
