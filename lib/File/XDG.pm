@@ -152,8 +152,8 @@ spec.
 =item
 
 On some systems, this module will look in system specific locations for
-the L</runtime_dir>.  This is useful, but technically violates the spec,
-so under strict mode the L</runtime_dir> method will only return a path
+the L</runtime_home>.  This is useful, but technically violates the spec,
+so under strict mode the L</runtime_home> method will only return a path
 if one can be found via the spec.
 
 =back
@@ -343,14 +343,14 @@ sub state_home {
   return $self->_dir($self->{state}, $self->{name});
 }
 
-=head2 runtime_dir
+=head2 runtime_home
 
 [version 0.10]
 
- my $dir = $xdg->runtime_dir;
+ my $dir = $xdg->runtime_home;
 
-Returns the base directory for user-specific non-essential runtime files and other file objects
-(such as sockets, named pipes, etc).
+Returns the directory for user-specific non-essential runtime files and other file objects
+(such as sockets, named pipes, etc) for the application.
 
 This is not always provided, if not available, this method will return C<undef>.
 
@@ -368,12 +368,19 @@ The path C</run/user/UID> will be used, if it exists, and fulfills the requireme
 
 =cut
 
-sub runtime_dir
+sub runtime_home
+{
+  my($self) = @_;
+  my $base = $self->_runtime_dir;
+  defined $base ? $self->_dir($base, $self->{name}) : undef;
+}
+
+sub _runtime_dir
 {
   my($self) = @_;
   if(defined $self->{runtime_dir})
   {
-    return $self->_dir($self->{runtime_dir});
+    return $self->{runtime_dir};
   }
 
   # the spec says only to look for the environment variable
@@ -396,7 +403,7 @@ sub runtime_dir
     next unless -o $maybe;
     my $perm = [stat $maybe]->[2] & oct('0777');
     next unless $perm == oct('0700');
-    return $self->_dir($maybe);
+    return $maybe;
   }
 
   return undef;
