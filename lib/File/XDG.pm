@@ -85,7 +85,7 @@ Name of the application for which File::XDG is being used.
 
 The path class to return
 
-=over 4
+=over
 
 =item L<File::Spec>
 
@@ -129,6 +129,25 @@ between files and directories.
      sub { Path::Class::Dir->new(@_) },
    ],
  );
+
+=back
+
+=item strict
+
+[version 0.10]
+
+More strictly follow the XDG base directory specification.  In particular
+
+=over 4
+
+=item
+
+On Windows a an exception will be thrown when creating the L<File::XDG>
+object because the spec cannot correctly be implemented.
+
+Historically this module has made some useful assumptions like using
+C<;> instead of C<:> for the path separator character.  This breaks the
+spec.
 
 =back
 
@@ -189,6 +208,10 @@ sub new {
       Carp::croak("Unknown path class: $path_class");
     }
 
+    my $strict = delete $args{strict};
+    Carp::croak("XDG base directory specification cannot strictly implemented on Windows")
+      if $^O eq 'MSWin32' && $strict;
+
     Carp::croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
@@ -196,6 +219,7 @@ sub new {
         api        => $api,
         file_class => $file_class,
         dir_class  => $dir_class,
+        strict     => $strict,
     }, $class;
 
     if($^O eq 'MSWin32') {

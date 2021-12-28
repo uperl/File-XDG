@@ -158,6 +158,24 @@ subtest 'path_class' => sub {
 
 };
 
+subtest 'strict - operating system' => sub {
+
+  if($^O eq 'MSWin32')
+  {
+    local $@ = '';
+    eval {
+      File::XDG->new( name => 'foo', strict => 1 );
+    };
+    like "$@", qr/^XDG base directory specification cannot strictly implemented on Windows/;
+  }
+  else
+  {
+    my $xdg = File::XDG->new( name => 'foo', strict => 1 );
+    isa_ok $xdg, 'File::XDG';
+  }
+
+};
+
 sub test_lookup {
   my ($home_m, $dirs_m, $lookup_m) = @_;
 
