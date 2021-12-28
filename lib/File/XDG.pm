@@ -149,6 +149,13 @@ Historically this module has made some useful assumptions like using
 C<;> instead of C<:> for the path separator character.  This breaks the
 spec.
 
+=item
+
+On some systems, this module will look in system specific locations for
+the L</runtime_dir>.  This is useful, but technically violates the spec,
+so under strict mode the L</runtime_dir> method will only return a path
+if one can be found via the spec.
+
 =back
 
 =back
