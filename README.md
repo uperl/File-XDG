@@ -157,6 +157,27 @@ my $path = $xdg->cache_home;
 
 Returns the user-specific cache directory for the application as a path class object.
 
+## runtime\_dir
+
+\[version 0.10\]
+
+```perl
+my $dir = $xdg->runtime_dir;
+```
+
+Returns the base directory for user-specific non-essential runtime files and other file objects
+(such as sockets, named pipes, etc).
+
+This is not always provided, if not available, this method will return `undef`.
+
+Under strict mode, this method will only rely on the `XDG_RUNTIME_DIR` to find this directory.
+Under non-strict mode, system specific methods may be used, if the environment variable is not
+set:
+
+- Linux systemd
+
+    The path `/run/user/UID` will be used, if it exists, and fulfills the requirements of the spec.
+
 ## data\_dirs
 
 ```perl

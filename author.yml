@@ -10,6 +10,7 @@ pod_spelling_system:
    - XDG
    - Aman
    - api
+   - systemd
 
 pod_coverage:
   skip: 0
