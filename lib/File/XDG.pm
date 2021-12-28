@@ -222,12 +222,12 @@ sub new {
     Carp::croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
-        name        => $name,
-        api         => $api,
-        file_class  => $file_class,
-        dir_class   => $dir_class,
-        strict      => $strict,
-        runtime_dir => $ENV{XDG_RUNTIME_DIR},
+        name       => $name,
+        api        => $api,
+        file_class => $file_class,
+        dir_class  => $dir_class,
+        strict     => $strict,
+        runtime    => $ENV{XDG_RUNTIME_DIR},
     }, $class;
 
     if($^O eq 'MSWin32') {
@@ -378,9 +378,9 @@ sub runtime_home
 sub _runtime_dir
 {
   my($self) = @_;
-  if(defined $self->{runtime_dir})
+  if(defined $self->{runtime})
   {
-    return $self->{runtime_dir};
+    return $self->{runtime};
   }
 
   # the spec says only to look for the environment variable
@@ -395,7 +395,7 @@ sub _runtime_dir
 
   foreach my $maybe (@maybe)
   {
-    # if we are going rogue and trying to find the runtime_dir
+    # if we are going rogue and trying to find the runtime dir
     # on our own, then we hould at least check that the directory
     # fufills the requirements of the spec: directory, owned by
     # us, with permission of 0700.
