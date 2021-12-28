@@ -176,6 +176,28 @@ subtest 'strict - operating system' => sub {
 
 };
 
+subtest 'runtime_dir' => sub {
+
+  my @args;
+  push @args, name   => 'foo';
+  push @args, strict => 1 if $^O ne 'MSWin32';
+
+  my $dir = File::Temp->newdir;
+  local $ENV{XDG_RUNTIME_DIR} = $dir;
+
+  ok(
+    -d File::XDG->new(@args)->runtime_dir
+  );
+
+  delete $ENV{XDG_RUNTIME_DIR};
+
+  is(
+    File::XDG->new(@args)->runtime_dir,
+    undef,
+  );
+
+};
+
 sub test_lookup {
   my ($home_m, $dirs_m, $lookup_m) = @_;
 

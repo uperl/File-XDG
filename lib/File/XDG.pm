@@ -215,11 +215,12 @@ sub new {
     Carp::croak("unknown arguments: @{[ sort keys %args ]}") if %args;
 
     my $self = bless {
-        name       => $name,
-        api        => $api,
-        file_class => $file_class,
-        dir_class  => $dir_class,
-        strict     => $strict,
+        name        => $name,
+        api         => $api,
+        file_class  => $file_class,
+        dir_class   => $dir_class,
+        strict      => $strict,
+        runtime_dir => $ENV{XDG_RUNTIME_DIR},
     }, $class;
 
     if($^O eq 'MSWin32') {
@@ -318,6 +319,65 @@ sub cache_home {
     my $self = shift;
     my $xdg = $self->{cache};
     return $self->_dir($xdg, $self->{name});
+}
+
+=head2 runtime_dir
+
+[version 0.10]
+
+ my $dir = $xdg->runtime_dir;
+
+Returns the base directory for user-specific non-essential runtime files and other file objects
+(such as sockets, named pipes, etc).
+
+This is not always provided, if not available, this method will return C<undef>.
+
+Under strict mode, this method will only rely on the C<XDG_RUNTIME_DIR> to find this directory.
+Under non-strict mode, system specific methods may be used, if the environment variable is not
+set:
+
+=over 4
+
+=item Linux systemd
+
+The path C</run/user/UID> will be used, if it exists, and fulfills the requirements of the spec.
+
+=back
+
+=cut
+
+sub runtime_dir
+{
+  my($self) = @_;
+  if(defined $self->{runtime_dir})
+  {
+    return $self->_dir($self->{runtime_dir});
+  }
+
+  # the spec says only to look for the environment variable
+  return undef if $self->{strict};
+
+  my @maybe;
+
+  if($^O eq 'linux')
+  {
+    push @maybe, "/run/user/$<";
+  }
+
+  foreach my $maybe (@maybe)
+  {
+    # if we are going rogue and trying to find the runtime_dir
+    # on our own, then we hould at least check that the directory
+    # fufills the requirements of the spec: directory, owned by
+    # us, with permission of 0700.
+    next unless -d $maybe;
+    next unless -o $maybe;
+    my $perm = [stat $maybe]->[2] & oct('0777');
+    next unless $perm == oct('0700');
+    return $self->_dir($maybe);
+  }
+
+  return undef;
 }
 
 =head2 data_dirs
