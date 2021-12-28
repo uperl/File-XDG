@@ -236,6 +236,7 @@ sub new {
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$local\\.local\\share\\";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$local\\.cache\\";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$local\\.config\\";
+        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$local\\.state\\";
         $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '';
         $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '';
     } else {
@@ -243,6 +244,7 @@ sub new {
         $self->{home}        = $home;
         $self->{data}        = $ENV{XDG_DATA_HOME}   || "$home/.local/share/";
         $self->{cache}       = $ENV{XDG_CACHE_HOME}  || "$home/.cache/";
+        $self->{state}       = $ENV{XDG_STATE_HOME}  || "$home/.state/";
         $self->{config}      = $ENV{XDG_CONFIG_HOME} || "$home/.config/";
         $self->{data_dirs}   = $ENV{XDG_DATA_DIRS}   || '/usr/local/share:/usr/share';
         $self->{config_dirs} = $ENV{XDG_CONFIG_DIRS} || '/etc/xdg';
@@ -326,6 +328,19 @@ sub cache_home {
     my $self = shift;
     my $xdg = $self->{cache};
     return $self->_dir($xdg, $self->{name});
+}
+
+=head2 state_home
+
+ my $path = $xdg->state_home;
+
+Returns the user-specific state directory for the application as a path class object.
+
+=cut
+
+sub state_home {
+  my $self = shift;
+  return $self->_dir($self->{state}, $self->{name});
 }
 
 =head2 runtime_dir

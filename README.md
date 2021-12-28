@@ -162,6 +162,14 @@ my $path = $xdg->cache_home;
 
 Returns the user-specific cache directory for the application as a path class object.
 
+## state\_home
+
+```perl
+my $path = $xdg->state_home;
+```
+
+Returns the user-specific state directory for the application as a path class object.
+
 ## runtime\_dir
 
 \[version 0.10\]
