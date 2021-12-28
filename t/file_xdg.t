@@ -176,7 +176,7 @@ subtest 'strict - operating system' => sub {
 
 };
 
-subtest 'runtime_dir' => sub {
+subtest 'runtime_home' => sub {
 
   my @args;
   push @args, name   => 'foo';
@@ -184,15 +184,16 @@ subtest 'runtime_dir' => sub {
 
   my $dir = File::Temp->newdir;
   local $ENV{XDG_RUNTIME_DIR} = $dir;
+  mkdir "$dir/foo" or die;
 
   ok(
-    -d File::XDG->new(@args)->runtime_dir
+    -d File::XDG->new(@args)->runtime_home
   );
 
   delete $ENV{XDG_RUNTIME_DIR};
 
   is(
-    File::XDG->new(@args)->runtime_dir,
+    File::XDG->new(@args)->runtime_home,
     undef,
   );
 

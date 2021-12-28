@@ -132,8 +132,8 @@ Takes the following named arguments:
         spec.
 
     - On some systems, this module will look in system specific locations for
-    the ["runtime\_dir"](#runtime_dir).  This is useful, but technically violates the spec,
-    so under strict mode the ["runtime\_dir"](#runtime_dir) method will only return a path
+    the ["runtime\_home"](#runtime_home).  This is useful, but technically violates the spec,
+    so under strict mode the ["runtime\_home"](#runtime_home) method will only return a path
     if one can be found via the spec.
 
 # METHODS
@@ -170,16 +170,16 @@ my $path = $xdg->state_home;
 
 Returns the user-specific state directory for the application as a path class object.
 
-## runtime\_dir
+## runtime\_home
 
 \[version 0.10\]
 
 ```perl
-my $dir = $xdg->runtime_dir;
+my $dir = $xdg->runtime_home;
 ```
 
-Returns the base directory for user-specific non-essential runtime files and other file objects
-(such as sockets, named pipes, etc).
+Returns the directory for user-specific non-essential runtime files and other file objects
+(such as sockets, named pipes, etc) for the application.
 
 This is not always provided, if not available, this method will return `undef`.
 
