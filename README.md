@@ -118,6 +118,19 @@ Takes the following named arguments:
         );
         ```
 
+- strict
+
+    \[version 0.10\]
+
+    More strictly follow the XDG base directory specification.  In particular
+
+    - On Windows a an exception will be thrown when creating the [File::XDG](https://metacpan.org/pod/File::XDG)
+    object because the spec cannot correctly be implemented.
+
+        Historically this module has made some useful assumptions like using
+        `;` instead of `:` for the path separator character.  This breaks the
+        spec.
+
 # METHODS
 
 ## data\_home

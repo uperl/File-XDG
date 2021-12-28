@@ -1,6 +1,7 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+  - Added option strict (gh#19)
   - Added exe_dir method (gh#15, gh#18)
 
 0.09_01   2021-12-27 12:58:16 -0700
