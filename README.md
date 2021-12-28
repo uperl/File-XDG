@@ -131,6 +131,11 @@ Takes the following named arguments:
         `;` instead of `:` for the path separator character.  This breaks the
         spec.
 
+    - On some systems, this module will look in system specific locations for
+    the ["runtime\_dir"](#runtime_dir).  This is useful, but technically violates the spec,
+    so under strict mode the ["runtime\_dir"](#runtime_dir) method will only return a path
+    if one can be found via the spec.
+
 # METHODS
 
 ## data\_home
