@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+0.11      2021-12-30 05:42:19 -0700
+  - Production release identical to 0.10_01
+
 0.10_01   2021-12-28 10:36:10 -0700
   - Added option strict (gh#19)
   - Added exe_dir method (gh#15, gh#18)
