@@ -5,9 +5,9 @@ Basic implementation of the XDG base directory specification
 # SYNOPSIS
 
 ```perl
-use File::XDG;
+use File::XDG 1.00;
 
-my $xdg = File::XDG->new(name => 'foo');
+my $xdg = File::XDG->new( name => 'foo', api => 1 );
 
 # user config
 my $path = $xdg->config_home;
@@ -53,13 +53,11 @@ Takes the following named arguments:
 
     - api = 0
 
-        The default and original API version.
+        The default and original API version.  For backward compatibility only.
 
     - api = 1
 
-        Currently experimental API version.  This will issue a warning when invoked
-        until version `1.00` is released.  At this point the version 1 API will
-        be stable.
+        Recommended stable API version for all new code.
 
 - name
 
@@ -250,17 +248,7 @@ according to the spec.
 ## lookup\_data\_file
 
 ```perl
-# api = 0
-my $path = $xdg->lookup_data_file($subdir, $filename);
-```
-
-Looks up the data file by searching for `./$subdir/$filename` relative to all base
-directories indicated by `$XDG_DATA_HOME` and `$XDG_DATA_DIRS`. If an environment
-variable is either not set or empty, its default value as defined by the
-specification is used instead. Returns a path class object.
-
-```perl
-# api = 1
+my $xdg = File::XDG->new( name => $name, api => 1 ); # recommended
 my $path = $xdg->lookup_data_File($filename);
 ```
 
@@ -270,20 +258,20 @@ provided by the constructor) relative to all base directories indicated by
 not set or empty, its default value as defined by the specification is used
 instead. Returns a path class object.
 
+```perl
+my $xdg = File::XDG->new( name => $name ); # back compat only
+my $path = $xdg->lookup_data_file($subdir, $filename);
+```
+
+Looks up the data file by searching for `./$subdir/$filename` relative to all base
+directories indicated by `$XDG_DATA_HOME` and `$XDG_DATA_DIRS`. If an environment
+variable is either not set or empty, its default value as defined by the
+specification is used instead. Returns a path class object.
+
 ## lookup\_config\_file
 
 ```perl
-# api = 0
-my $path = $xdg->lookup_config_file($subdir, $filename);
-```
-
-Looks up the configuration file by searching for `./$subdir/$filename` relative to
-all base directories indicated by `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an
-environment variable is either not set or empty, its default value as defined
-by the specification is used instead. Returns a path class object.
-
-```perl
-# api = 1
+my $xdg = File::XDG->new( name => $name, api => 1 ); # recommended
 my $path = $xdg->lookup_config_file($filename);
 ```
 
@@ -292,6 +280,16 @@ provided by the constructor) relative to all base directories indicated by
 `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an environment variable is
 either not set or empty, its default value as defined by the specification
 is used instead. Returns a path class object.
+
+```perl
+my $xdg = File::XDG->new( name => $name ); # back compat only
+my $path = $xdg->lookup_config_file($subdir, $filename);
+```
+
+Looks up the configuration file by searching for `./$subdir/$filename` relative to
+all base directories indicated by `$XDG_CONFIG_HOME` and `$XDG_CONFIG_DIRS`. If an
+environment variable is either not set or empty, its default value as defined
+by the specification is used instead. Returns a path class object.
 
 # SEE ALSO
 
