@@ -1,6 +1,8 @@
 Revision history for {{$dist->name}}
 
 {{$NEXT}}
+
+1.00_01   2022-01-01 15:17:34 -0700
   - api = 1 is no longer experimental, no longer warns and is
     better documented (gh#23)
 
