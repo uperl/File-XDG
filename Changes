@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+1.01      2022-02-23 08:06:52 -0700
+  - Production release identical to 1.00_01
+
 1.00_01   2022-01-01 15:17:34 -0700
   - api = 1 is no longer experimental, no longer warns and is
     better documented (gh#23)
