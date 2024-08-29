@@ -2,6 +2,9 @@ Revision history for {{$dist->name}}
 
 {{$NEXT}}
 
+1.03      2024-08-29 07:42:49 -0600
+  - Update license text (fixes gh#28)
+
 1.02      2022-05-18 15:34:26 -0600
   - Correct location of the default state directory (gh#24,gh#25)
 
