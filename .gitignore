@@ -2,3 +2,5 @@
 /.build
 *.bak
 *.swp
+*.old
+*.orig
