@@ -11,6 +11,7 @@ pod_spelling_system:
    - Aman
    - api
    - systemd
+   - Síle
 
 pod_coverage:
   skip: 0
